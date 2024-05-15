@@ -9,6 +9,6 @@ add_rules("mode.debug", "mode.release")
 add_includedirs(vendor["boost"] .. "/include")
 add_linkdirs(vendor["boost"] .. "/lib")
 
-target("exp")
+target("expty")
     add_files("src/*.cpp")
     add_links("boost_program_options", "util", "pthread")
