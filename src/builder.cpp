@@ -38,14 +38,26 @@ Builder::Builder(int argc, char* argv[]) {
 }
 
 Builder& Builder::append(const std::string& field, const std::string& value) {
-    std::cout << "append " << field << " => " << value << "\n";
+    // std::cout << "append " << field << " => " << value << "\n";
     if (field == "stage") {
         stage_ = &executor_.stages_.emplace_back();
         stage_->name_ = value;
-    } else if (field == "expect") {
+        return *this;
+    }
+    if (!stage_) {
+        std::cerr << "error: invalid expect def\n";
+        return *this;
+    }
+    if (field == "expect") {
         entry_ = &stage_->entries_.emplace_back();
         entry_->expect_ = value;
-    } else if (field == "write") {
+        return *this;
+    }
+    if (!entry_) {
+        std::cerr << "error: invalid expect def\n";
+        return *this;
+    }
+    if (field == "write") {
         entry_->write_ = value;
     } else if (field == "next") {
         entry_->next_ = value;

@@ -8,21 +8,30 @@
 #include <pty.h>
 
 int main(int argc, char* argv[]) {
-    Builder builder(argc, argv);
+    Builder builder(argc - 1, argv + 1);
     Executor executor = builder.build();
+
+    if (argv[1][0] == '-') {
+        std::cerr << "error: invalid command '" << argv[1] << "'\n";
+        return -1;
+    }
 
     int master;
     char name[256];
     struct winsize winp;
     const int pid = ::forkpty(&master, name, nullptr, &winp);
     if (pid == 0) { // child process
-        return boost::process::system("bash -i");
+        try {
+            return boost::process::system(argv[1]);
+        } catch(const std::exception& ex) {
+            std::cerr << "error: failed to spawn '" << argv[1] << "'\n";
+            return -1;
+        }
     } else { // parent process
-        std::cout << "child process: " << pid << "\n";
         boost::asio::io_context io;
         boost::asio::posix::stream_descriptor src(io, master);
         boost::asio::steady_timer run(io);
-        executor.run(src, run);
+        executor.run(pid, src, run);
         io.run();
         ::kill(pid, SIGTERM);
         // ::waitpid(pid, nullptr, 0);
