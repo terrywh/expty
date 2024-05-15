@@ -13,7 +13,7 @@ class Entry {
     std::string   next_;
     bool         clear_;
 public:
-    const Stage* operator()(Executor& e, boost::asio::posix::stream_descriptor& src) const;
+    const Stage* operator()(Executor& e, boost::asio::posix::stream_descriptor& src, bool verbose) const;
     friend class Builder;
 };
 
@@ -21,7 +21,7 @@ class Stage {
     std::string           name_;
     std::vector<Entry> entries_;
 public:
-    const Stage* operator()(Executor& e, boost::asio::posix::stream_descriptor& src) const;
+    const Stage* operator()(Executor& e, boost::asio::posix::stream_descriptor& src, bool verbose) const;
     const std::string& name() const { return name_; }
     friend class Builder;
 };

@@ -3,12 +3,14 @@
 #include "stage.h"
 #include <boost/asio/posix/stream_descriptor.hpp>
 #include <boost/asio/steady_timer.hpp>
+#include <boost/program_options/variables_map.hpp>
 #include <string>
 #include <vector>
 
 class Executor {
-    std::vector<Stage> stages_;
-    const Stage*        stage_;
+    bool debug_ {};
+    std::vector<Stage>     stages_;
+    const Stage*            stage_;
     std::string            output_;
     std::array<char, 4096> buffer_;
     void on_read(const boost::system::error_code& error, std::size_t size);
@@ -17,7 +19,7 @@ class Executor {
     void start_quit(const int pid, boost::asio::posix::stream_descriptor& src, boost::asio::steady_timer& run);
 
 public:
-    Executor() = default;
+    Executor(boost::program_options::variables_map& options);
     Executor(Executor&& e) = default;
     ~Executor() = default;
 

@@ -1,26 +1,13 @@
 #include "builder.h"
-#include <boost/program_options.hpp>
 #include <iostream>
 
-Builder::Builder(int argc, char* argv[]) {
-    boost::program_options::options_description desc("命令行说明");
-    desc.add_options()
-        ("help,h", "输出此帮助信息")
-        ("stage,s", boost::program_options::value<std::vector<std::string>>(), "匹配阶段，同阶段仅匹配一条规则")
-        ("write,w", boost::program_options::value<std::vector<std::string>>(), "写入/输入")
-        ("expect,e", boost::program_options::value<std::vector<std::string>>(), "匹配内容")
-        ("next,n", boost::program_options::value<std::vector<bool>>()->zero_tokens(), "进入下一匹配阶段")
-        ("goto,g", boost::program_options::value<std::vector<std::string>>(), "跳转指定匹配阶段")
-        ("done", boost::program_options::bool_switch(), "结束匹配过程");
-    
-    auto parsed = boost::program_options::command_line_parser(argc, argv).options(desc).run();
+Builder::Builder(boost::program_options::variables_map& options,
+    boost::program_options::options_description& desc, std::vector<std::string>& rules)
+: executor_(options) {
+    auto parsed = boost::program_options::command_line_parser(rules).options(desc).run();
     std::string field, value;
     for (auto& opt: parsed.options) {
-        if (opt.string_key == "help") {
-            std::cout << desc << "\n";
-            ::exit(1);
-            return;
-        } else if (opt.string_key.empty()) {
+        if (opt.string_key.empty()) {
             value.push_back(' ');
             value.append(opt.value[0]);
         } else {
